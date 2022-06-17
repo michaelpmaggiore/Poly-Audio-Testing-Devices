@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[196]:
+# In[198]:
 
 
 # Standard Libraries 
@@ -126,7 +126,7 @@ for letter in incorrect_original_characters_total_list:
         incorrect_original_count_list[9] += 1
 
 
-# In[194]:
+# In[199]:
 
 
 # Plots out frequency of incorrect original letters
@@ -138,7 +138,7 @@ plt.ylabel("Frequency")
 plt.show()
 
 
-# In[195]:
+# In[200]:
 
 
 # Plots out frequency of incorrect feedback letters
@@ -150,22 +150,31 @@ plt.ylabel("Frequency")
 plt.show()
 
 
+# In[209]:
+
+
+# # Plots a confusion matrix to compare the mixture of incorrect original and incorrect feedback characters.
+# # Darker box indicates that the combination of original and feedback characters is often mixed up for one another.
+# cf_matrix = confusion_matrix(incorrect_original_count_list, incorrect_feedback_count_list)
+# ax = sns.heatmap(cf_matrix, annot=True, cmap='Blues')
+# ax.set_title('Seaborn Confusion Matrix with labels\n\n');
+# ax.set_xlabel('\nFeedback Characters')
+# ax.set_ylabel('Original Characters ');
+
+# ## Ticket labels
+# ax.set_xticks(np.arange(0, 10, step=1))
+# ax.set_yticks(np.arange(0, 10, step=1))
+# ax.xaxis.set_ticklabels(incorrect_letters_list)
+# ax.yaxis.set_ticklabels(incorrect_letters_list)
+
+# ## Display the visualization of the Confusion Matrix.
+# plt.show()
+
+# I don't know how to make a combination confusion matrix that compares the characters and see which is usually mixed together.
+
+
 # In[ ]:
 
 
-# Plots a confusion matrix to compare the mixture of incorrect original and incorrect feedback characters.
-# Darker box indicates that the combination of original and feedback characters is often mixed up for one another.
-cf_matrix = confusion_matrix(y_test, y_pred)
-ax = sns.heatmap(cf_matrix, annot=True, cmap='Blues')
 
-ax.set_title('Seaborn Confusion Matrix with labels\n\n');
-ax.set_xlabel('\nFeedback Characters')
-ax.set_ylabel('Original Characters ');
-
-## Ticket labels
-ax.xaxis.set_ticklabels(incorrect_letters_list)
-ax.yaxis.set_ticklabels(incorrect_letters_list)
-
-## Display the visualization of the Confusion Matrix.
-plt.show()
 
