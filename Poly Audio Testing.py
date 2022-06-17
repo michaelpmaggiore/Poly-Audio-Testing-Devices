@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[198]:
+# In[31]:
 
+
+pd.options.mode.chained_assignment = None  # default='warn' | This erases a warning
 
 # Standard Libraries 
 import seaborn as sns
@@ -20,6 +22,9 @@ incorrect_original_characters_list = []
 incorrect_feedback_characters_list = []
 incorrect_feedback_characters_total_list = []
 incorrect_original_characters_total_list = []
+old_incorrect_combination_list = []
+new_incorrect_combination_list = []
+new_incorrect_point_list = []
 average_score_list_each_device = []
 
 # Add brackets within average_score_list_all_tests that are separated by comma
@@ -41,6 +46,7 @@ for i, row in microphone_results.iterrows():
             incorrect_feedback_characters_total_list.append(row[4][char_count])
             incorrect_original_characters_list.append(row[3][char_count])
             incorrect_original_characters_total_list.append(row[3][char_count])
+            old_incorrect_combination_list.append([row[3][char_count],row[4][char_count]])
     microphone_results[' Incorrect Original Characters'][i] = ', '.join(incorrect_original_characters_list)
     microphone_results[' Incorrect Feedback Characters'][i] = ', '.join(incorrect_feedback_characters_list)
     i += 1
@@ -61,6 +67,14 @@ for i, row in microphone_results.iterrows():
     elif row[0] == device_names[5]:
         average_score_list_all_tests[5].append(row[5])
     
+# Creates a point system to see the most mixed up combination of original and feedback characters
+for combination in range(len(old_incorrect_combination_list)):
+    if ', '.join(old_incorrect_combination_list[combination]) not in new_incorrect_combination_list:
+            new_incorrect_combination_list.append(', '.join(old_incorrect_combination_list[combination]))
+            new_incorrect_point_list.append(1)
+    else:
+        index = new_incorrect_combination_list.index(', '.join(old_incorrect_combination_list[combination]))
+        new_incorrect_point_list[index] += 1
 
 display(microphone_results) # Displays nicely formatted table
 
@@ -77,7 +91,7 @@ plt.style.use("ggplot")
 plt.rcParams["figure.figsize"] = (15,10)
 plt.bar(device_names, average_score_list_each_device, color = ['red', 'orange', 'green', 'blue', 'grey', 'black']) # Add more colors if adding devices
 plt.title("Video Conferencing Devices- Audio Comparison")
-plt.xlabel("Devices")
+plt.xlabel("Device")
 plt.ylabel("Average Accuracy Score")
 plt.show()
 
@@ -126,26 +140,38 @@ for letter in incorrect_original_characters_total_list:
         incorrect_original_count_list[9] += 1
 
 
-# In[199]:
+# In[35]:
+
+
+# Plots and displays mixed combinations of original and feedback characters, along with their frequency to be mixed together
+plt.rcParams["figure.figsize"] = (15,10)
+plt.bar(new_incorrect_combination_list, new_incorrect_point_list)
+plt.title("Combination of Letters- Frequency Comparison")
+plt.xlabel("Letters (Original, Feedback)")
+plt.ylabel("Frequency of Combinations")
+plt.show()
+
+
+# In[36]:
 
 
 # Plots out frequency of incorrect original letters
 plt.style.use("ggplot")
 plt.bar(incorrect_letters_list, incorrect_original_count_list)
 plt.title("Frequency of Incorrect Original Letters")
-plt.xlabel("Incorrect Words")
+plt.xlabel("Incorrect Characters")
 plt.ylabel("Frequency")
 plt.show()
 
 
-# In[200]:
+# In[37]:
 
 
 # Plots out frequency of incorrect feedback letters
 plt.style.use("ggplot")
 plt.bar(incorrect_letters_list, incorrect_feedback_count_list)
 plt.title("Frequency of Incorrect Feedback Letters")
-plt.xlabel("Incorrect Words")
+plt.xlabel("Incorrect Characters")
 plt.ylabel("Frequency")
 plt.show()
 
@@ -171,10 +197,4 @@ plt.show()
 # plt.show()
 
 # I don't know how to make a combination confusion matrix that compares the characters and see which is usually mixed together.
-
-
-# In[ ]:
-
-
-
 
