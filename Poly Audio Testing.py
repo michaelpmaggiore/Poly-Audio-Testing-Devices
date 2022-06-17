@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[178]:
+# In[196]:
 
 
 # Standard Libraries 
+import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.metrics import confusion_matrix
 
 # To read in csv file
 microphone_results = pd.read_csv("audioResultsMicrophone.csv")
@@ -21,19 +23,19 @@ incorrect_original_characters_total_list = []
 average_score_list_each_device = []
 
 # Add brackets within average_score_list_all_tests that are separated by comma
-average_score_list_all_tests = [[],[],[]]
+average_score_list_all_tests = [[],[],[],[],[],[]]
 
 # Add more device names if there are more devices
-device_names = ["Poly X30", "Neat A20", "Jabra PanaCast 50"]
+device_names = ["Poly X30", "Neat A20", "Jabra PanaCast 50", "Logitech Rally Bar", "Yealink MeetingBar A20", "Yealink MeetingBar A30"]
 
-# Add more zeroes if there are more devices
+# Add more zeroes if there are more letters
 incorrect_feedback_count_list = [0,0,0,0,0,0,0,0,0,0]
 incorrect_original_count_list = [0,0,0,0,0,0,0,0,0,0]
 
 # Goes through each row and compares original characters with feedback characters
 i = 0
 for i, row in microphone_results.iterrows():
-    for char_count in range(20): # Increase range(n) by 2 if one new device is added
+    for char_count in range(20): # Increase range(n) by 2 if one new test is added
         if row[3][char_count] != row[4][char_count]:
             incorrect_feedback_characters_list.append(row[4][char_count])
             incorrect_feedback_characters_total_list.append(row[4][char_count])
@@ -52,6 +54,13 @@ for i, row in microphone_results.iterrows():
         average_score_list_all_tests[1].append(row[5])
     elif row[0] == device_names[2]:
         average_score_list_all_tests[2].append(row[5])
+    elif row[0] == device_names[3]:
+        average_score_list_all_tests[3].append(row[5])
+    elif row[0] == device_names[4]:
+        average_score_list_all_tests[4].append(row[5])
+    elif row[0] == device_names[5]:
+        average_score_list_all_tests[5].append(row[5])
+    
 
 display(microphone_results) # Displays nicely formatted table
 
@@ -65,7 +74,8 @@ for device in average_score_list_all_tests:
 
 # Plots and displays averages
 plt.style.use("ggplot")
-plt.bar(device_names, average_score_list_each_device, color = ['red', 'orange', 'green']) # Add more colors if adding devices
+plt.rcParams["figure.figsize"] = (15,10)
+plt.bar(device_names, average_score_list_each_device, color = ['red', 'orange', 'green', 'blue', 'grey', 'black']) # Add more colors if adding devices
 plt.title("Video Conferencing Devices- Audio Comparison")
 plt.xlabel("Devices")
 plt.ylabel("Average Accuracy Score")
@@ -116,7 +126,7 @@ for letter in incorrect_original_characters_total_list:
         incorrect_original_count_list[9] += 1
 
 
-# In[173]:
+# In[194]:
 
 
 # Plots out frequency of incorrect original letters
@@ -128,7 +138,7 @@ plt.ylabel("Frequency")
 plt.show()
 
 
-# In[174]:
+# In[195]:
 
 
 # Plots out frequency of incorrect feedback letters
@@ -137,5 +147,25 @@ plt.bar(incorrect_letters_list, incorrect_feedback_count_list)
 plt.title("Frequency of Incorrect Feedback Letters")
 plt.xlabel("Incorrect Words")
 plt.ylabel("Frequency")
+plt.show()
+
+
+# In[ ]:
+
+
+# Plots a confusion matrix to compare the mixture of incorrect original and incorrect feedback characters.
+# Darker box indicates that the combination of original and feedback characters is often mixed up for one another.
+cf_matrix = confusion_matrix(y_test, y_pred)
+ax = sns.heatmap(cf_matrix, annot=True, cmap='Blues')
+
+ax.set_title('Seaborn Confusion Matrix with labels\n\n');
+ax.set_xlabel('\nFeedback Characters')
+ax.set_ylabel('Original Characters ');
+
+## Ticket labels
+ax.xaxis.set_ticklabels(incorrect_letters_list)
+ax.yaxis.set_ticklabels(incorrect_letters_list)
+
+## Display the visualization of the Confusion Matrix.
 plt.show()
 
