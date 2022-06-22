@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[31]:
+# In[93]:
 
-
-pd.options.mode.chained_assignment = None  # default='warn' | This erases a warning
 
 # Standard Libraries 
 import seaborn as sns
@@ -12,6 +10,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import confusion_matrix
+
+pd.options.mode.chained_assignment = None  # default='warn' | This erases a warning
 
 # To read in csv file
 microphone_results = pd.read_csv("audioResultsMicrophone.csv")
@@ -25,6 +25,11 @@ incorrect_original_characters_total_list = []
 old_incorrect_combination_list = []
 new_incorrect_combination_list = []
 new_incorrect_point_list = []
+poly_orignal_incorrect_letter_list = []
+poly_feedback_incorrect_letter_list = []
+poly_old_incorrect_combination_list = []
+poly_new_incorrect_combination_list = []
+poly_new_incorrect_point_list = []
 average_score_list_each_device = []
 
 # Add brackets within average_score_list_all_tests that are separated by comma
@@ -36,6 +41,8 @@ device_names = ["Poly X30", "Neat A20", "Jabra PanaCast 50", "Logitech Rally Bar
 # Add more zeroes if there are more letters
 incorrect_feedback_count_list = [0,0,0,0,0,0,0,0,0,0]
 incorrect_original_count_list = [0,0,0,0,0,0,0,0,0,0]
+poly_incorrect_feedback_count_list = [0,0,0,0,0,0,0,0,0,0]
+poly_incorrect_original_count_list = [0,0,0,0,0,0,0,0,0,0]
 
 # Goes through each row and compares original characters with feedback characters
 i = 0
@@ -47,8 +54,14 @@ for i, row in microphone_results.iterrows():
             incorrect_original_characters_list.append(row[3][char_count])
             incorrect_original_characters_total_list.append(row[3][char_count])
             old_incorrect_combination_list.append([row[3][char_count],row[4][char_count]])
+            if microphone_results['Device'][i] == "Poly X30":
+                poly_orignal_incorrect_letter_list.append(row[3][char_count])
+                poly_feedback_incorrect_letter_list.append(row[4][char_count])
+                poly_old_incorrect_combination_list.append([row[3][char_count],row[4][char_count]])
+            
     microphone_results[' Incorrect Original Characters'][i] = ', '.join(incorrect_original_characters_list)
     microphone_results[' Incorrect Feedback Characters'][i] = ', '.join(incorrect_feedback_characters_list)
+    
     i += 1
     incorrect_original_characters_list.clear()
     incorrect_feedback_characters_list.clear()
@@ -76,6 +89,15 @@ for combination in range(len(old_incorrect_combination_list)):
         index = new_incorrect_combination_list.index(', '.join(old_incorrect_combination_list[combination]))
         new_incorrect_point_list[index] += 1
 
+# Creates a Poly X30 point system to see the most mixed up combination of original and feedback characters
+for combination in range(len(poly_old_incorrect_combination_list)):
+    if ', '.join(poly_old_incorrect_combination_list[combination]) not in poly_new_incorrect_combination_list:
+            poly_new_incorrect_combination_list.append(', '.join(poly_old_incorrect_combination_list[combination]))
+            poly_new_incorrect_point_list.append(1)
+    else:
+        index = poly_new_incorrect_combination_list.index(', '.join(poly_old_incorrect_combination_list[combination]))
+        poly_new_incorrect_point_list[index] += 1
+
 display(microphone_results) # Displays nicely formatted table
 
 # Goes through each test (A1, A2, A3, B1...) and creates score average for each device
@@ -89,10 +111,11 @@ for device in average_score_list_all_tests:
 # Plots and displays averages
 plt.style.use("ggplot")
 plt.rcParams["figure.figsize"] = (15,10)
-plt.bar(device_names, average_score_list_each_device, color = ['red', 'orange', 'green', 'blue', 'grey', 'black']) # Add more colors if adding devices
+plt.bar(device_names, average_score_list_each_device, color = ['peru', 'orange', 'green', 'mediumturquoise', 'slategray', 'dimgrey']) # Add more colors if adding devices
 plt.title("Video Conferencing Devices- Audio Comparison")
 plt.xlabel("Device")
 plt.ylabel("Average Accuracy Score")
+plt.ylim([7.5, 10.5])
 plt.show()
 
 # Point system to calculate an individual letter's error/incorrect score
@@ -139,44 +162,88 @@ for letter in incorrect_original_characters_total_list:
     else:
         incorrect_original_count_list[9] += 1
 
+# Point system to individually calculate Poly X30's error/incorrect score
+for letter in poly_feedback_incorrect_letter_list:
+    if letter == "B":
+        poly_incorrect_feedback_count_list[0] += 1
+    elif letter == "C":
+        incorrect_feedback_count_list[1] += 1
+    elif letter == "D":
+        poly_incorrect_feedback_count_list[2] += 1
+    elif letter == "E":
+        poly_incorrect_feedback_count_list[3] += 1
+    elif letter == "G":
+        poly_incorrect_feedback_count_list[4] += 1
+    elif letter == "P":
+        poly_incorrect_feedback_count_list[5] += 1
+    elif letter == "T":
+        poly_incorrect_feedback_count_list[6] += 1
+    elif letter == "V":
+        poly_incorrect_feedback_count_list[7] += 1
+    elif letter == "Z":
+        poly_incorrect_feedback_count_list[8] += 1
+    else:
+        incorrect_count_list[9] += 1
+for letter in poly_orignal_incorrect_letter_list:
+    if letter == "B":
+        poly_incorrect_original_count_list[0] += 1
+    elif letter == "C":
+        poly_incorrect_original_count_list[1] += 1
+    elif letter == "D":
+        poly_incorrect_original_count_list[2] += 1
+    elif letter == "E":
+        poly_incorrect_original_count_list[3] += 1
+    elif letter == "G":
+        poly_incorrect_original_count_list[4] += 1
+    elif letter == "P":
+        poly_incorrect_original_count_list[5] += 1
+    elif letter == "T":
+        poly_incorrect_original_count_list[6] += 1
+    elif letter == "V":
+        poly_incorrect_original_count_list[7] += 1
+    elif letter == "Z":
+        poly_incorrect_original_count_list[8] += 1
+    else:
+        poly_incorrect_original_count_list[9] += 1
 
-# In[35]:
+
+# In[77]:
 
 
 # Plots and displays mixed combinations of original and feedback characters, along with their frequency to be mixed together
 plt.rcParams["figure.figsize"] = (15,10)
-plt.bar(new_incorrect_combination_list, new_incorrect_point_list)
+plt.bar(new_incorrect_combination_list, new_incorrect_point_list, color = "red")
 plt.title("Combination of Letters- Frequency Comparison")
 plt.xlabel("Letters (Original, Feedback)")
 plt.ylabel("Frequency of Combinations")
 plt.show()
 
 
-# In[36]:
+# In[78]:
 
 
 # Plots out frequency of incorrect original letters
 plt.style.use("ggplot")
-plt.bar(incorrect_letters_list, incorrect_original_count_list)
+plt.bar(incorrect_letters_list, incorrect_original_count_list, color = "teal")
 plt.title("Frequency of Incorrect Original Letters")
 plt.xlabel("Incorrect Characters")
 plt.ylabel("Frequency")
 plt.show()
 
 
-# In[37]:
+# In[79]:
 
 
 # Plots out frequency of incorrect feedback letters
 plt.style.use("ggplot")
-plt.bar(incorrect_letters_list, incorrect_feedback_count_list)
+plt.bar(incorrect_letters_list, incorrect_feedback_count_list, color = "green")
 plt.title("Frequency of Incorrect Feedback Letters")
 plt.xlabel("Incorrect Characters")
 plt.ylabel("Frequency")
 plt.show()
 
 
-# In[209]:
+# In[80]:
 
 
 # # Plots a confusion matrix to compare the mixture of incorrect original and incorrect feedback characters.
@@ -197,4 +264,49 @@ plt.show()
 # plt.show()
 
 # I don't know how to make a combination confusion matrix that compares the characters and see which is usually mixed together.
+
+
+# In[81]:
+
+
+# Plots out frequency of incorrect feedback letters for the Poly X30 Device
+plt.style.use("ggplot")
+x_axis = np.arange(len(incorrect_letters_list))
+plt.bar(x_axis, poly_incorrect_original_count_list, color = "orange")
+plt.xticks(x_axis, incorrect_letters_list)
+plt.title("Frequency of Incorrect Original Letters for the Poly X30")
+plt.xlabel("Incorrect Characters")
+plt.ylabel("Frequency")
+plt.show()
+
+
+# In[82]:
+
+
+# Plots out frequency of incorrect feedback letters for the Poly X30 Device
+plt.style.use("ggplot")
+x_axis = np.arange(len(incorrect_letters_list))
+plt.bar(x_axis, poly_incorrect_feedback_count_list, color = "gold")
+plt.xticks(x_axis, incorrect_letters_list)
+plt.title("Frequency of Incorrect Feedback Letters for Poly X30")
+plt.xlabel("Incorrect Characters")
+plt.ylabel("Frequency")
+plt.show()
+
+
+# In[86]:
+
+
+# Plots and displays mixed combinations of original and feedback characters for the Poly X30, along with their frequency to be mixed together
+plt.bar(poly_new_incorrect_combination_list, poly_new_incorrect_point_list, color = "cornflowerblue")
+plt.title("Combination of Letters for Poly X30- Frequency Comparison")
+plt.xlabel("Letters (Original, Feedback)")
+plt.ylabel("Frequency of Combinations")
+plt.show()
+
+
+# In[ ]:
+
+
+
 
